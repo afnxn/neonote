@@ -20,10 +20,7 @@ class _HomePageState extends State<HomePage>{
   //   super.initState();
   //   getdata();
   // }
- List<String> create_list(L){
-   List<String> emails = L.map((user) => user.value).toList();
-   return emails;
- }
+
  void  _getdata() async{
     String userInput = _textEditingController.text;
 
