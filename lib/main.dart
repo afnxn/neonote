@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:neonote/views/TextEditor.dart';
 import 'package:neonote/views/homepage.dart';
 
 void main() {
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      home: const TextEditor(),
     );
   }
 }
