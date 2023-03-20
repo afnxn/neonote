@@ -8,14 +8,23 @@ import 'package:flutter/services.dart';
 import 'package:flutter_quill/extensions.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tuple/tuple.dart';
 
+import '../models/Note.dart';
 import '../models/Post.dart';
+import '../services/NoteService.dart';
 import '../services/RemoteService.dart';
+import '../services/SearchService.dart';
 
 
 class TextEditor extends StatefulWidget {
-  const TextEditor({Key? key}) :super(key: key);
+  final Note? note;
+  final SharedPreferences? preferences;
+  const TextEditor({Key? key, this.note, this.preferences}) :super(key: key);
+
+
+
 
   @override
   _TextEditorState createState() => _TextEditorState();
@@ -24,18 +33,43 @@ class TextEditor extends StatefulWidget {
 class _TextEditorState extends State<TextEditor>{
 
   QuillController _controller = QuillController.basic();
+
   ScrollController _scrollController = ScrollController();
+
   FocusNode _focusNode = FocusNode();
+  Note? _note;
   Post? posts;
   List<String> myList = [];
+
   var isLoaded=false;
+
   TextEditingController _textEditingController = TextEditingController();
+
   String _getText() {
     return _controller.document.toPlainText();
   }
+  @override
+  void initState() {
+    super.initState();
+    if(widget.note!=null){
+      String? text = widget.note!.text;
+      try {
+        _controller = QuillController(
+
+          document: Document()..insert(0, text),
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      }
+      catch(e){
+        print(e);
+      }
+    }
+
+
+  }
   void  _getdata() async{
     String userInput = _controller.document.toPlainText();
-    print(userInput);
+    // print(userInput);
     posts= await RemoteService().getPosts(userInput);
     posts!.data.mainLemmas.removeWhere((element) => element.score<10);
     myList=posts!.data.mainLemmas.map((user) => user.value).toList();
@@ -46,7 +80,26 @@ class _TextEditorState extends State<TextEditor>{
       });
     }
   }
+  Future<void> _savedata() async {
+    String text = _getText();
+    List<String> tags = widget.note!.tags; // add your logic to get tags
+    Note note = Note(
+      text: text,
+      tags: tags,
+    );
 
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    SearchService noteService = SearchService(preferences);
+    List<Note> notes=noteService.getAllNotes();
+    NoteService.updateNote(notes: notes, text:widget.note!.text , tags: widget.note!.tags, new_text: text, new_tags: ['afnan']);
+
+    NoteService.addNote(notes: notes, text:widget.note!.text , tags: widget.note!.tags);
+    // if (widget.note != null) {
+    //   _note!.text = _controller.document.toPlainText();
+    //   _note!.tags = widget.note!.tags;
+    //   SearchService(widget.preferences!).save(_note!);
+    // }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +111,10 @@ class _TextEditorState extends State<TextEditor>{
             icon: Icon(Icons.save),
             onPressed: _getdata,
           ),
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: _savedata,
+          ),
         ],
       ),
       body: Column(
@@ -68,7 +125,9 @@ class _TextEditorState extends State<TextEditor>{
             height: 56, // adjust this value as needed
             child: ListView.builder(
                 scrollDirection: Axis.horizontal,
+
                 itemCount:posts!.data.mainLemmas.length,
+
                 itemBuilder: (context,index){
 
                   return Container(

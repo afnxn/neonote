@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:neonote/models/Post.dart';
 import 'package:neonote/services/RemoteService.dart';
 import 'dart:convert';
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) :super(key: key);
+class APITest extends StatefulWidget {
+  const APITest({Key? key}) :super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _APITestState createState() => _APITestState();
 }
-class _HomePageState extends State<HomePage>{
+class _APITestState extends State<APITest>{
   Post? posts;
   List<String> myList = [];
   var isLoaded=false;

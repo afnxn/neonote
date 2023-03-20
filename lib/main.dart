@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:neonote/views/HomePage.dart';
 import 'package:neonote/views/TextEditor.dart';
-import 'package:neonote/views/homepage.dart';
+import 'package:neonote/views/APITest.dart';
+import 'package:neonote/views/SearchBar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,8 +28,19 @@ class MyApp extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
+        useMaterial3: true,
       ),
-      home: const TextEditor(),
+      home:HomePage(),
+      // home:FutureBuilder<SharedPreferences>(
+      //   future: SharedPreferences.getInstance(),
+      //   builder: (context, snapshot) {
+      //     if (snapshot.hasData) {
+      //       return SearchBar(preferences: snapshot.data!);
+      //     } else {
+      //       return Center(child: CircularProgressIndicator());
+      //     }
+      //   },
+      // ),
     );
   }
 }
