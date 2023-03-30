@@ -27,8 +27,9 @@ class NoteService {
     required List<Note> notes,
     required String text,
     required List<String> tags,
+    required bool isPinned,
   }) {
-    Note note = Note(text: text, tags: tags);
+    Note note = Note(text: text, tags: tags,isPinned: isPinned);
     notes.add(note);
     saveNotes(notes);
   }
@@ -36,19 +37,42 @@ class NoteService {
     required List<Note> notes,
     required String new_text,
     required List<String> new_tags,
+    required bool new_isPinned,
     required String text,
     required List<String> tags,
+    required bool isPinned,
   }) {
     // Note note_1 = Note(text: text, tags: tags);
     for (Note note in notes) {
       if(note.text == text){
-        note.text=new_text;
+        note.text=new_text.trimRight();
         note.tags=new_tags;
+        note.isPinned = new_isPinned;
       }
       // notesJson.add(json.encode(note.toJson()));
     }
 
     // notes.add(note);
+    saveNotes(notes);
+  }
+  static void deleteNote({
+    required List<Note> notes,
+    required String text,
+    required List<String> tags,
+    required bool isPinned,
+  }) {
+    for (Note note in notes){
+      // print(note.text);
+    }
+    for (int i = 0; i < notes.length; i++) {
+      // print(text);
+      // print( notes[i].text);
+      if (notes[i].text == text ) {
+        // print(text);
+        notes.removeAt(i);
+        break;
+      }
+    }
     saveNotes(notes);
   }
 

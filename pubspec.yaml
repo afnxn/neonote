@@ -38,6 +38,7 @@ dependencies:
   http: ^0.13.5
   flutter_quill: ^6.4.4
   shared_preferences: ^2.0.8
+  dynamic_color: any
 
 dev_dependencies:
   flutter_test:

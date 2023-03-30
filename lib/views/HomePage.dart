@@ -37,8 +37,8 @@ class _HomePageState extends State<HomePage>{
         }),
         destinations: const<Widget>[
           NavigationDestination(icon: Icon(Icons.email), label: ''),
-          NavigationDestination(icon: Icon(Icons.email), label: ''),
-          NavigationDestination(icon: Icon(Icons.email), label: '')
+          NavigationDestination(icon: Icon(Icons.search), label: ''),
+          NavigationDestination(icon: Icon(Icons.library_add), label: '')
         ]
       ),
 

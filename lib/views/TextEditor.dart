@@ -82,6 +82,28 @@ class _TextEditorState extends State<TextEditor>{
   }
   Future<void> _savedata() async {
     String text = _getText();
+    // List<String> tags = widget.note!.tags; // add your logic to get tags
+    // Note note = Note(
+    //   text: text,
+    //   tags: tags,
+    // );
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    SearchService noteService = SearchService(preferences);
+    List<Note> notes=noteService.getAllNotes();
+
+    if(widget.note != null && widget.note?.text!=null){
+      NoteService.updateNote(notes: notes, text:widget.note!.text , tags: widget.note!.tags, isPinned:widget.note!.isPinned!, new_text: text, new_tags: ['hi'],new_isPinned:widget.note!.isPinned!);
+      // Navigator.of().pop();
+    }
+   else{
+      NoteService.addNote(notes: notes, text: text, tags: ['afnan'],isPinned:widget.note!.isPinned!);
+    }
+
+  }
+
+  Future<void> _deldata() async {
+    String text = _getText();
     List<String> tags = widget.note!.tags; // add your logic to get tags
     Note note = Note(
       text: text,
@@ -91,9 +113,9 @@ class _TextEditorState extends State<TextEditor>{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     SearchService noteService = SearchService(preferences);
     List<Note> notes=noteService.getAllNotes();
-    NoteService.updateNote(notes: notes, text:widget.note!.text , tags: widget.note!.tags, new_text: text, new_tags: ['afnan']);
-
-    NoteService.addNote(notes: notes, text:widget.note!.text , tags: widget.note!.tags);
+    NoteService.deleteNote(notes: notes, text: widget.note!.text, tags: widget.note!.tags, isPinned:widget.note!.isPinned!);
+    // NoteService.addNote(notes: notes, text: text, tags: ['afnan']);
+    // NoteService.addNote(notes: notes, text:widget.note!.text , tags: widget.note!.tags);
     // if (widget.note != null) {
     //   _note!.text = _controller.document.toPlainText();
     //   _note!.tags = widget.note!.tags;
@@ -108,13 +130,26 @@ class _TextEditorState extends State<TextEditor>{
         title: Text('My Editor'),
         actions: [
           IconButton(
-            icon: Icon(Icons.save),
+            icon: Icon(Icons.publish),
             onPressed: _getdata,
           ),
           IconButton(
-            icon: Icon(Icons.search),
-            onPressed: _savedata,
+            icon: Icon(Icons.save),
+            onPressed:() {
+              _savedata();
+              if(widget.note != null && widget.note?.text!=null){
+                Navigator.of(context).pop();
+              }
+              },
           ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              _deldata();
+              Navigator.of(context).pop();
+            },
+          )
+
         ],
       ),
       body: Column(

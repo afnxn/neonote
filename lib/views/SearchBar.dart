@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/Note.dart';
+import '../services/NoteService.dart';
 import '../services/SearchService.dart';
 import 'TextEditor.dart';
 
@@ -25,10 +26,13 @@ class _SearchBarState extends State<SearchBar> {
   @override
   void initState() {
     super.initState();
+    // _refresh();
     _noteService = SearchService(widget.preferences);
     _allNotes = _noteService.getAllNotes();
     _searchResults = List.from(_allNotes);
+    _searchResults.sort((a, b) =>(a.isPinned == b.isPinned) ? 0 : (b.isPinned ? 1 : -1));
   }
+
 
   @override
   void dispose() {
@@ -51,8 +55,24 @@ class _SearchBarState extends State<SearchBar> {
       _newNoteController.clear();
     }
   }
+  Future<void> _updatePin(Note note, bool new_p) async {
+    // String text = _getText();
+    // List<String> tags = widget.note!.tags; // add your logic to get tags
+    // Note note = Note(
+    //   text: text,
+    //   tags: tags,
+    // );
 
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    SearchService noteService = SearchService(preferences);
+    List<Note> notes=noteService.getAllNotes();
+
+    // if(note != null && note?.text!=null){
+      NoteService.updateNote(notes: notes, text:note!.text , tags: note!.tags, isPinned:note!.isPinned!, new_text:note!.text, new_tags: note!.tags,new_isPinned:new_p);
+      // Navigator.of().pop();
+  }
   void _searchNotes(String query) {
+    // _refresh;
     if (query.isNotEmpty) {
       setState(() {
         _searchResults = _allNotes
@@ -64,6 +84,7 @@ class _SearchBarState extends State<SearchBar> {
       setState(() {
 
         _searchResults = List.from(_allNotes);
+        _searchResults.sort((a, b) =>(a.isPinned == b.isPinned) ? 0 : (b.isPinned ? 1 : -1));
 
       });
     }
@@ -77,19 +98,7 @@ class _SearchBarState extends State<SearchBar> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _newNoteController,
-              decoration: InputDecoration(
-                hintText: 'Add a new note',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: _saveNewNote,
-                ),
-              ),
-            ),
-          ),
+          //
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
@@ -111,6 +120,17 @@ class _SearchBarState extends State<SearchBar> {
                 final note = _searchResults[index];
 
                 return ListTile(
+                  trailing:GestureDetector(
+                    onTap: () {
+                      _updatePin(note, !note.isPinned);
+                      setState(() {
+                        note.isPinned = !note.isPinned;
+                      });
+                    },
+                    child: note.isPinned
+                        ? Icon(Icons.favorite, color: Colors.red)
+                        : Icon(Icons.favorite),
+                  ),
                   title: Text(note.text),
 
                   subtitle: Text(note.tags.join(', ')),

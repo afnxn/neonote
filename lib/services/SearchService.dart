@@ -11,8 +11,9 @@ class SearchService {
 
   List<Note> getAllNotes() {
     // [{"text":"hi my name is afnan","tags":["afnan"]}, {"text":"hello hi hi","tags":["hi","hi"]}
+    // _preferences.clear();
     List<String> noteStrings = _preferences.getStringList('notes') ?? [];
-    print(noteStrings);
+    // print(noteStrings);
     List<Note> notes = [];
     for (String noteJson in noteStrings) {
       notes.add(Note.fromJson(json.decode(noteJson)));
@@ -22,7 +23,7 @@ class SearchService {
 
   void save(Note note) {
     List<String> noteStrings = _preferences.getStringList('notes') ?? [];
-    String noteString = '{"text":"${note.text}","tags":"${note.tags.join(',')}';
+    String noteString = json.encode(note.toJson());
     noteStrings.add(noteString);
     _preferences.setStringList('notes', noteStrings);
   }
@@ -49,5 +50,12 @@ class SearchService {
     }
 
     return matchingNotes;
+  }
+  void togglePinnedState(Note note) {
+    final notes = getAllNotes();
+    final index = notes.indexOf(note);
+    notes[index].isPinned = !notes[index].isPinned;
+
+    _preferences.setStringList('notes', notes.map((n) => n.toJsonString()).toList());
   }
 }
