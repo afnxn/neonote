@@ -12,9 +12,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tuple/tuple.dart';
 
 import '../models/Note.dart';
-import '../models/Post.dart';
+// import '../models/Post.dart';
+import '../services/GetTagsService.dart';
 import '../services/NoteService.dart';
-import '../services/RemoteService.dart';
+// import '../services/RemoteService.dart';
 import '../services/SearchService.dart';
 
 
@@ -38,7 +39,7 @@ class _TextEditorState extends State<TextEditor>{
 
   FocusNode _focusNode = FocusNode();
   Note? _note;
-  Post? posts;
+  // Post? posts;
   List<String> myList = [];
 
   var isLoaded=false;
@@ -67,13 +68,16 @@ class _TextEditorState extends State<TextEditor>{
 
 
   }
+
   void  _getdata() async{
     String userInput = _controller.document.toPlainText();
-    // print(userInput);
-    posts= await RemoteService().getPosts(userInput);
-    posts!.data.mainLemmas.removeWhere((element) => element.score<10);
-    myList=posts!.data.mainLemmas.map((user) => user.value).toList();
-    if (posts != null){
+    print(userInput);
+    final  lol=await generateText(userInput);
+    print(lol);
+    // posts= await RemoteService().getPosts(userInput);
+    // posts!.data.mainLemmas.removeWhere((element) => element.score<10);
+    myList=lol;
+    if (myList.isNotEmpty){
       setState(() {
         isLoaded=true;
 
@@ -91,13 +95,14 @@ class _TextEditorState extends State<TextEditor>{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     SearchService noteService = SearchService(preferences);
     List<Note> notes=noteService.getAllNotes();
-
+    // print(notes);
+    print(widget.note?.noteID);
     if(widget.note != null && widget.note?.text!=null){
-      NoteService.updateNote(notes: notes, text:widget.note!.text , tags: widget.note!.tags, isPinned:widget.note!.isPinned!, new_text: text, new_tags: ['hi'],new_isPinned:widget.note!.isPinned!);
+      NoteService.updateNote(notes: notes, text:widget.note!.text , tags: widget.note!.tags, isPinned:widget.note!.isPinned!, new_text: text, new_tags:  myList,new_isPinned:widget.note!.isPinned!);
       // Navigator.of().pop();
     }
    else{
-      NoteService.addNote(notes: notes, text: text, tags: ['afnan'],isPinned:widget.note!.isPinned!);
+      NoteService.addNote(notes: notes, text: text, tags:  myList,isPinned:false);
     }
 
   }
@@ -105,10 +110,10 @@ class _TextEditorState extends State<TextEditor>{
   Future<void> _deldata() async {
     String text = _getText();
     List<String> tags = widget.note!.tags; // add your logic to get tags
-    Note note = Note(
-      text: text,
-      tags: tags,
-    );
+    // Note note = Note.createNoteWithUniqueID(
+    //   text: text,
+    //   tags: tags, notes: ,
+    // );
 
     SharedPreferences preferences = await SharedPreferences.getInstance();
     SearchService noteService = SearchService(preferences);
@@ -161,7 +166,7 @@ class _TextEditorState extends State<TextEditor>{
             child: ListView.builder(
                 scrollDirection: Axis.horizontal,
 
-                itemCount:posts!.data.mainLemmas.length,
+                itemCount:myList.length,
 
                 itemBuilder: (context,index){
 

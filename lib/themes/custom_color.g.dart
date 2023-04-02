@@ -89,7 +89,6 @@ class CustomColors extends ThemeExtension<CustomColors> {
       onRedContainer: onRedContainer ?? this.onRedContainer,
     );
   }
-
   @override
   CustomColors lerp(ThemeExtension<CustomColors>? other, double t) {
     if (other is! CustomColors) {

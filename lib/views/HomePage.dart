@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:neonote/models/Post.dart';
-import 'package:neonote/services/RemoteService.dart';
+import 'package:neonote/views/AllClustersView.dart';
 import 'dart:convert';
 
-import 'package:neonote/views/APITest.dart';
 import 'package:neonote/views/SearchBar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/ClusterService.dart';
+import 'CreateClusterView.dart';
 import 'TextEditor.dart';
 class HomePage extends StatefulWidget {
 
@@ -15,7 +15,30 @@ class HomePage extends StatefulWidget {
 }
 class _HomePageState extends State<HomePage>{
   int index=0;
-  final screens=[APITest(),FutureBuilder<SharedPreferences>(
+  final screens=[
+    FutureBuilder<SharedPreferences>(
+    future: SharedPreferences.getInstance(),
+    builder: (context, snapshot) {
+      if (snapshot.hasData) {
+        return CreateClusterView(preferences: snapshot.data!);
+      } else {
+        return Center(child: CircularProgressIndicator());
+      }
+    },
+  ),
+    FutureBuilder<SharedPreferences>(
+      future: SharedPreferences.getInstance(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return AllClustersView(preferences: snapshot.data!);
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    ),
+
+
+    FutureBuilder<SharedPreferences>(
     future: SharedPreferences.getInstance(),
     builder: (context, snapshot) {
       if (snapshot.hasData) {
@@ -24,7 +47,9 @@ class _HomePageState extends State<HomePage>{
         return Center(child: CircularProgressIndicator());
       }
     },
-  ),TextEditor()];
+  ),
+
+    TextEditor()];
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -37,6 +62,7 @@ class _HomePageState extends State<HomePage>{
         }),
         destinations: const<Widget>[
           NavigationDestination(icon: Icon(Icons.email), label: ''),
+          NavigationDestination(icon: Icon(Icons.notes), label: ''),
           NavigationDestination(icon: Icon(Icons.search), label: ''),
           NavigationDestination(icon: Icon(Icons.library_add), label: '')
         ]

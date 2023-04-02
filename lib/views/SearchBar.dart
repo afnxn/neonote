@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/Note.dart';
+import '../services/GetTagsService.dart';
 import '../services/NoteService.dart';
 import '../services/SearchService.dart';
 import 'TextEditor.dart';
@@ -26,6 +27,8 @@ class _SearchBarState extends State<SearchBar> {
   @override
   void initState() {
     super.initState();
+
+
     // _refresh();
     _noteService = SearchService(widget.preferences);
     _allNotes = _noteService.getAllNotes();
@@ -43,9 +46,9 @@ class _SearchBarState extends State<SearchBar> {
 
   void _saveNewNote() {
     if (_newNoteController.text.isNotEmpty) {
-      final newNote = Note(
-        text: _newNoteController.text.trim(),
-        tags: [],
+      final newNote = Note.createNoteWithUniqueID(
+        _newNoteController.text.trim(),
+         [], notes: _allNotes,
       );
       _noteService.save(newNote);
       setState(() {
@@ -63,6 +66,8 @@ class _SearchBarState extends State<SearchBar> {
     //   tags: tags,
     // );
 
+    // List<String> list = lol.trimLeft().split(',');
+    // print(list);
     SharedPreferences preferences = await SharedPreferences.getInstance();
     SearchService noteService = SearchService(preferences);
     List<Note> notes=noteService.getAllNotes();

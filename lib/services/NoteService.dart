@@ -29,7 +29,8 @@ class NoteService {
     required List<String> tags,
     required bool isPinned,
   }) {
-    Note note = Note(text: text, tags: tags,isPinned: isPinned);
+    Note note = Note.createNoteWithUniqueID(text, tags, isPinned: isPinned, notes:notes);
+    print(note.noteID);
     notes.add(note);
     saveNotes(notes);
   }
